@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CmsShoppingCart.Models.Data;
+using CmsShoppingCart.Models.ViewModels.Pages;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -11,7 +13,19 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
         // GET: Admin/Pages
         public ActionResult Index()
         {
-            return View();
+            // Declare list of PageVM
+            List<PagesVM> pagesList;
+
+            
+            using (Db db = new Db())
+            {
+                // Init the list
+                pagesList = db.Pages.ToArray().OrderBy(x => x.Sorting).Select(x => new PagesVM(x)).ToList();
+            }
+
+
+            // Return view with list
+            return View(pagesList);
         }
     }
 }
