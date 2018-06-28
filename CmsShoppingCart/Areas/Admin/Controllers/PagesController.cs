@@ -29,10 +29,70 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
         }
 
         // GET: Admin/Pages/AddPage
+        [HttpGet]
         public ActionResult AddPage()
         {
             return View();
         }
+
+
+        // GET: Admin/Pages/AddPage
+        [HttpPost]
+        public ActionResult AddPage(PagesVM model)
+        {
+            // Check Model state
+            if(!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            using (Db db = new Db())
+            {
+                // Declare slug
+                string slug;
+
+                // init pageDTO
+                PageDTO dto = new PageDTO();
+
+                // DTO title
+                dto.Title = model.Title;
+
+                // Check for and set slug if needed
+                if (string.IsNullOrWhiteSpace(model.Slug))
+                {
+                    slug = model.Title.Replace(" ", "-").ToLower();
+                }
+                else
+                {
+                    slug = model.Slug.Replace(" ", "-").ToLower();
+                }
+
+                // Make sure title and slug are unique
+                if ( db.Pages.Any(x => x.Title == model.Title) || db.Pages.Any(x => x.Slug == slug))
+                {
+                    ModelState.AddModelError("", "That title or slug already exists.");
+                    return View(model);
+                }
+
+                // DTO the rest
+                dto.Slug = slug;
+                dto.Body = model.Body;
+                dto.HasSidebar = model.HasSidebar;
+                dto.Sorting = 100;
+
+
+                // Save DTO
+                db.Pages.Add(dto);
+                db.SaveChanges();
+            }
+
+            // Set TempData Message
+            TempData["SM"] = "You have added a new page.";
+
+            //Redirect
+            return RedirectToAction("AddPage");
+        }
+
 
     }
 }
