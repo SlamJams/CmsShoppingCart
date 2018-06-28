@@ -16,7 +16,7 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
             // Declare list of PageVM
             List<PagesVM> pagesList;
 
-            
+
             using (Db db = new Db())
             {
                 // Init the list
@@ -41,7 +41,7 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
         public ActionResult AddPage(PagesVM model)
         {
             // Check Model state
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return View(model);
             }
@@ -68,7 +68,7 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
                 }
 
                 // Make sure title and slug are unique
-                if ( db.Pages.Any(x => x.Title == model.Title) || db.Pages.Any(x => x.Slug == slug))
+                if (db.Pages.Any(x => x.Title == model.Title) || db.Pages.Any(x => x.Slug == slug))
                 {
                     ModelState.AddModelError("", "That title or slug already exists.");
                     return View(model);
@@ -93,6 +93,29 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
             return RedirectToAction("AddPage");
         }
 
+        // GET: Admin/Pages/EditPage/id
+        public ActionResult EditPage(int id)
+        {
+            //Declare pageVM
+            PagesVM model;
+
+            using (Db db = new Db())
+            {
+                // Get the page
+                PageDTO dto = db.Pages.Find(id);
+
+                // Comfirm page exists
+                if ( dto == null)
+                {
+                    return Content("The page does not exists.");
+                }
+                // init pageVM
+                model = new PagesVM(dto);
+            }
+
+            //return view with model
+            return View(model);
+        }
 
     }
 }
