@@ -35,7 +35,6 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
             return View();
         }
 
-
         // GET: Admin/Pages/AddPage
         [HttpPost]
         public ActionResult AddPage(PagesVM model)
@@ -181,5 +180,30 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
             return RedirectToAction("EditPage");
         }
 
+        // GET: Admin/Pages/PageDetails/id
+        public ActionResult PageDetails(int id)
+        {
+            //declare pageVM
+            PagesVM model;
+
+            using (Db db = new Db())
+            {
+
+
+                //get the page
+                PageDTO dto = db.Pages.Find(id);
+
+                // confirm page exists
+                if ( dto == null)
+                {
+                    return Content("That page does not exists.");
+                }
+
+                // init pageVM
+                model = new PagesVM(dto);
+            }
+            //return view with the model
+            return View(model);
+        }
     }
 }
