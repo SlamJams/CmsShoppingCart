@@ -35,7 +35,7 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
             return View();
         }
 
-        // GET: Admin/Pages/AddPage
+        // POST: Admin/Pages/AddPage
         [HttpPost]
         public ActionResult AddPage(PagesVM model)
         {
@@ -224,7 +224,7 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
-        // GET: Admin/Pages/reorderPages
+        // POST: Admin/Pages/reorderPages
         [HttpPost]
         public void ReorderPages(int[] id)
         {
@@ -248,6 +248,50 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
                 }
 
             }
+        }
+
+        // GET: Admin/Pages/EditSidebar
+        [HttpGet]
+        public ActionResult EditSidebar()
+        {
+            // declare model
+            SidebarVM model;
+
+            using (Db db = new Db())
+            {
+
+                // get the DTO
+                SidebarDTO dto = db.Sidebar.Find(1);
+                //init model
+                model = new SidebarVM(dto);
+            }
+            // return the view with model
+
+            return View(model);
+        }
+
+        // POST: Admin/Pages/EditSidebar
+        [HttpPost]
+        public ActionResult EditSidebar(SidebarVM model)
+        {
+            using (Db db = new Db())
+            {
+
+                // get the DTO
+                SidebarDTO dto = db.Sidebar.Find(1);
+
+                // Transfer the body
+                dto.Body = model.Body;
+
+                //save
+                db.SaveChanges();
+            }
+
+            // Set TempData Message
+            TempData["SM"] = "You have edited the sidebar.";
+
+            //Redirect
+            return RedirectToAction("EditSidebar");
         }
     }
 }
