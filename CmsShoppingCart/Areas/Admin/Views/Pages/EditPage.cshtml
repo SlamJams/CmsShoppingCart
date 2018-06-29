@@ -49,7 +49,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Body, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.TextAreaFor(model => model.Body, new { @class = "form-control" } )
+                @Html.TextAreaFor(model => model.Body, new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.Body, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -75,3 +75,12 @@
 <div>
     @Html.ActionLink("Back to Pages", "Index")
 </div>
+
+@section Scripts {
+
+    <script src="~/Scripts/ckeditor/ckeditor.js"></script>
+    <script>
+    CKEDITOR.replace("Body");
+    </script>
+
+}
