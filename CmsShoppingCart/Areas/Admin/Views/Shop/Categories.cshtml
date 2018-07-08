@@ -33,7 +33,7 @@ else
         @foreach (var item in Model) {
             <tr>
                 <td>
-                    @Html.EditorFor(modelItem => item.Name, new { htmlAttributes = new { @class = "form-control" }, @readonly = "readonly" })
+                    @Html.EditorFor(modelItem => item.Name, new { htmlAttributes = new { @class = "form-control" , @readonly = "readonly" }})
                 </td>
                 <td>
                     @Html.ActionLink("Delete", "DeleteCategory", new { id=item.Id }, new {@class = "delete"})
@@ -44,3 +44,97 @@ else
     </table>
 }
 
+@section Scripts
+{
+    <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>
+    <script>
+        $(function() {
+
+            //Add new category
+            var newCategoryA = $("a#newcata");
+            var newCategoryTextInput = $("#newcategoryname");
+            var ajaxText = $("span.ajax-text");
+            var table = $("table#pages tbody");
+
+            newCategoryTextInput.keyup(function(e) {
+                if (e.keyCode == 13) {
+                    newCategoryA.click();
+                }
+            });
+
+            newCategoryA.click(function(e) {
+                e.preventDefault();
+
+                var catName = newCategoryTextInput.val();
+
+                if (catName.length < 2) {
+                    alert("Category name must be at least 2 characters long.");
+                    return false;
+                }
+
+                ajaxText.show();
+
+                var url = "/admin/shop/AddNewCategory";
+
+                $.post(url,
+                    { catName: catName },
+                    function(data) {
+                        var response = data.trim();
+
+                        if (response == "titletaken") {
+                            ajaxText.html("<span class='alert-danger'>That title is taken.</span>");
+                            setTimeout(function() {
+                                    ajaxText.fadeOut("fast",
+                                        function() {
+                                            ajaxText.html("<img src=/Content/Images / ajax - loader.gif");
+                                        });
+                                },2000);
+                            return false;
+                        } else {
+                            if (!$("table#pages").length) {
+                                location.reload();
+                            } else {
+                                ajaxText.html("<span class='alert alert-success'>Category has been added.</span>");
+                                setTimeout(function() {
+                                    ajaxText.fadeOut("fast",
+                                        function() {
+                                            ajaxText.html("<img src=/Content/Images / ajax - loader.gif");
+                                        });
+                                }, 2000);
+
+                                newCategoryTextInput("");
+
+                                var toAppend = $("table#pages tbody tr:last").clone();
+                                toAppend.attr("id", "id_" + data);
+                                toAppend.find("#item_Name").val(catName);
+                                toAppend.find("a.delete").attr("href", "/admin/shop/DeleteCategory/");
+                                table.append(toAppend);
+                                table.sortable("refresh");
+                            }
+                        }
+            });
+        });
+        ///////////////////////////////////////////////////////////////////
+
+        //Confirm deletion message
+        $("table#pages tbody").sortable({
+            items: "tr:not(.home)",
+            placeholder: "ui-state-highlight",
+            update: function() {
+                var ids = $("table#pages tbody").sortable("serialize");
+                var url = "/Admin/Pages/ReorderPages";
+
+                $.post(url,
+                    ids,
+                    function(data) {
+
+                    });
+            }
+        });
+
+        ///////////////////////////////////////////////////////////////////
+
+    });
+
+    </script>
+}
